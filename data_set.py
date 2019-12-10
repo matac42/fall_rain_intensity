@@ -19,7 +19,8 @@ def clock(counter_per_ten):
 def save_file_at_new_dir(new_dir_path, new_filename, new_file_content, mode='w'):
     os.makedirs(new_dir_path, exist_ok=True)
     with open(new_filename, "a") as f:
-        f.write(new_file_content)
+        f.writelines(",".join(new_file_content))
+        f.write("\n")
 
 rxfile = sorted(glob('RxData/*/*/*_csv.log'))
 
@@ -52,7 +53,7 @@ for file in rxfile:
                         counter_per_ten = clock(counter_per_ten)
                         # print(former_row[0:2])
                         # ファイル書き込み処理はここ
-                        save_file_at_new_dir(result_file_directory, result_file, fomer_row[0:2])
+                        save_file_at_new_dir(result_file_directory, result_file, former_row[0:2])
                     else:
                         pass
             except:
