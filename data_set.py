@@ -2,6 +2,7 @@ import csv
 import re
 from glob import glob
 import codecs
+import os
 
 #10秒単位のカウンターの動きを時間の経過のように振る舞わせる．例) 60sの次は70sではなく1m00sにする．
 def clock(counter_per_ten):
@@ -15,8 +16,18 @@ def clock(counter_per_ten):
         pass
     return counter_per_ten
 
-for file in glob('RxData/*/*/*_csv.log'):
-    print(file)
+def save_file_at_new_dir(new_dir_path, new_filename, new_file_content, mode='w'):
+    os.makedirs(new_dir_path, exist_ok=True)
+    with open(new_filename, "a") as f:
+        f.write(new_file_content)
+
+rxfile = sorted(glob('RxData/*/*/*_csv.log'))
+
+    
+
+for file in rxfile:
+    result_file = "result"+file
+    result_file_directory = re.sub(r'/\d+.\d+.\d+.\d+_csv.log', '', result_file)
     with open(file, 'r') as f:
         # null文字があるとファイルがうまく読み込まれないため，null文字を空白に置き換えている．
         reader = csv.reader((line.replace('\0','') for line in f))
@@ -27,22 +38,23 @@ for file in glob('RxData/*/*/*_csv.log'):
             try:
                 #1行ずつ読み込む
                 time = row[0]
-                time_no_coron = int(time[-8:-6]+time[-5:-3]+time[-2:])
+                time_no_coron = int(time.replace(":",""))
                 #10秒ずつ抽出
                 if time_no_coron == counter_per_ten:
-                    print(row[0:2])
+                    # print(row[0:2])
                     # ファイル書き込み処理はここ
+                    save_file_at_new_dir(result_file_directory, result_file, row[0:2])
                     counter_per_ten += 10
                     counter_per_ten = clock(counter_per_ten)
                 else:
                     if time_no_coron > counter_per_ten:
                         counter_per_ten += 10
                         counter_per_ten = clock(counter_per_ten)
-                        print(former_row[0:2], "former")
+                        # print(former_row[0:2])
                         # ファイル書き込み処理はここ
+                        save_file_at_new_dir(result_file_directory, result_file, fomer_row[0:2])
                     else:
                         pass
             except:
                 pass
             former_row = row
-    print(file)
