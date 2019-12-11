@@ -6,6 +6,7 @@ import os
 
 #10秒単位のカウンターの動きを時間の経過のように振る舞わせる．例) 60sの次は70sではなく1m00sにする．
 def clock(counter_per_ten):
+    counter_per_ten += 10
     str_counter_per_ten = str(counter_per_ten)
     try:
         if str_counter_per_ten[-2] == '6':
@@ -14,18 +15,21 @@ def clock(counter_per_ten):
             counter_per_ten += 4000
     except:
         pass
-    return counter_per_ten
 
+#ディレクトリと書き込み用ファイルの作成
 def save_file_at_new_dir(new_dir_path, new_filename, new_file_content, mode='w'):
     os.makedirs(new_dir_path, exist_ok=True)
     with open(new_filename, "a") as f:
         f.writelines(",".join(new_file_content))
         f.write("\n")
 
+#数値データを物理量に加工
+def num_processing(data):
+    if refile_11.fullmatch(file) != None:
+        #ここに数値処理を書く
+        pass
+
 rxfile = sorted(glob('RxData/*/*/*_csv.log'))
-
-    
-
 for file in rxfile:
     result_file = "result"+file
     result_file_directory = re.sub(r'/\d+.\d+.\d+.\d+_csv.log', '', result_file)
@@ -37,6 +41,8 @@ for file in rxfile:
         former_row = []
         status = r"\n*\d+:\d+:\d+,-?\d*,-?\d*,-?\d*\n*"
         restatus = re.compile(status)
+        file_11 = 'RxData/*/*/*11_csv.log'
+        refile_11 = re.compile(file_11)
         for row in reader:
             try:
                 #1行ずつ読み込む
@@ -44,24 +50,20 @@ for file in rxfile:
                 time_no_coron = int(time.replace(":",""))
                 #10秒ずつ抽出
                 if time_no_coron == counter_per_ten:
-                    # print(row[0:2])
-                    # ファイル書き込み処理はここ
+                    num_processing(row[1])
                     save_file_at_new_dir(result_file_directory, result_file, row[0:2])
-                    counter_per_ten += 10
-                    counter_per_ten = clock(counter_per_ten)
+                    clock(counter_per_ten)
                 else:
                     if time_no_coron > counter_per_ten:
-                        counter_per_ten += 10
-                        counter_per_ten = clock(counter_per_ten)
-                        # print(former_row[0:2])
-                        # ファイル書き込み処理はここ
                         # former_rowの形式があっているかを正規表現で確認
                         # あっていなければrow[0:2]を使う．
-                        # save_file_at_new_dir(result_file_directory, result_file, former_row[0:2])
                         if restatus.fullmatch(','.join(former_row)) != None:
+                            num_processing(row[1])
                             save_file_at_new_dir(result_file_directory, result_file, former_row[0:2])
                         else:
+                            num_processing(row[1])
                             save_file_at_new_dir(result_file_directory, result_file, row[0:2])
+                        clock(counter_per_ten)
                     else:
                         pass
             except:
