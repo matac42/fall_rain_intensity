@@ -35,6 +35,8 @@ for file in rxfile:
         #counter_per_ten: 10ごとにカウントする. 初期値は抽出開始時刻.
         counter_per_ten = 0
         former_row = []
+        status = r"\n*\d+:\d+:\d+,-?\d*,-?\d*,-?\d*\n*"
+        restatus = re.compile(status)
         for row in reader:
             try:
                 #1行ずつ読み込む
@@ -53,7 +55,13 @@ for file in rxfile:
                         counter_per_ten = clock(counter_per_ten)
                         # print(former_row[0:2])
                         # ファイル書き込み処理はここ
-                        save_file_at_new_dir(result_file_directory, result_file, former_row[0:2])
+                        # former_rowの形式があっているかを正規表現で確認
+                        # あっていなければrow[0:2]を使う．
+                        # save_file_at_new_dir(result_file_directory, result_file, former_row[0:2])
+                        if restatus.fullmatch(','.join(former_row)) != None:
+                            save_file_at_new_dir(result_file_directory, result_file, former_row[0:2])
+                        else:
+                            save_file_at_new_dir(result_file_directory, result_file, row[0:2])
                     else:
                         pass
             except:
