@@ -41,6 +41,9 @@ FILE_9 = r"RxData\/\d*\/\d*\/\d*.\d*.\d*.9_csv.log"
 FILE_NAM = r'/\d+.\d+.\d+.\d+_csv.log'
 restatus = re.compile(STATUS)
 refile_9 = re.compile(FILE_9)
+fine_wether = ['00:00:00','-50'] #仮の値です
+PER_DAY = 43200
+
 
 for file in rxfile:
     result_file = "result"+file
@@ -51,7 +54,9 @@ for file in rxfile:
         #counter_per_ten: 10ごとにカウントする. 初期値は抽出開始時刻.
         counter_per_ten = 0
         former_row = []
+        row_count = 0
         for row in reader:
+            row_count += 1
             try:
                 #1行ずつ読み込む
                 time = row[0]
@@ -77,3 +82,7 @@ for file in rxfile:
             except:
                 pass
             former_row = row
+        # データ数が半分以下の場合の処理
+        if row_count < PER_DAY/2:
+            for d in range(0, PER_DAY):
+                save_file_at_new_dir(result_file_directory, result_file, fine_wether[0:2])
