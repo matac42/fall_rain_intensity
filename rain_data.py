@@ -16,10 +16,11 @@ def judge_range(rain_data, data_list):
     rain_data = float(rain_data)
     while rain_data > rain_amount:
         rain_amount += 3.
-    if rain_data == 0:
-        data_list[int(rain_amount/3.)] += 1
-    else:
-        data_list[int(rain_amount/3.)-1] += 1
+    data_list[int(rain_amount/3.)] += 1
+    # if rain_data == 0:
+    #     data_list[int(rain_amount/3.)] += 1
+    # else:
+    #     data_list[int(rain_amount/3.)-1] += 1
     
     return data_list
 
@@ -27,7 +28,7 @@ def judge_range(rain_data, data_list):
 rainData = sorted(glob('RainData/*/*_rain.csv'))
 # max_rain = 0.
 FILE_NAM = r'\d*_rain.csv'
-data_list = [0] * 50
+data_list = [0] * 51
 for file in rainData:
     # result_file = "result"+file
     # result_file_directory = re.sub(FILE_NAM, '', result_file)
@@ -44,11 +45,19 @@ for file in rainData:
             except:
                 pass
 # mum = 0
-file_name = "resultRainData"
+file_name = "resultRainData.csv"
+accumulation = 0
+all_data = 0
+upper_limit = 150
 for data in data_list:
+    all_data += data
+for data in reversed(data_list):
+    accumulation += data
+    ratio = float(accumulation) / float(all_data) * 100
     with open(file_name, "a") as f:
-        f.write(str(data)+"\n")
-
+        f.write(str(upper_limit)+","+str(ratio)+"\n")
+    upper_limit -= 3
+print(all_data)
     # mum+=data
 # print(mum)
 # print(max_rain)
