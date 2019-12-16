@@ -17,7 +17,7 @@ def clock(counter_per_ten):
     return counter_per_ten
 
 #ディレクトリと書き込み用ファイルの作成
-def save_file_at_new_dir(new_dir_path, new_filename, new_file_content, mode='w'):
+def save_file_at_new_dir(new_dir_path, new_filename, new_file_content):
     os.makedirs(new_dir_path, exist_ok=True)
     with open(new_filename, "a") as f:
         f.writelines(",".join(new_file_content))
@@ -62,6 +62,8 @@ for file in rxfile:
                 time = row[0]
                 time_no_coron = int(time.replace(":",""))
                 #10秒ずつ抽出
+                if time_no_coron - counter_per_ten > 10:
+                    counter_per_ten = time_no_coron
                 if time_no_coron == counter_per_ten:
                     row[1] = num_processing(refile_9, f, row[1])
                     save_file_at_new_dir(result_file_directory, result_file, row[0:2])
